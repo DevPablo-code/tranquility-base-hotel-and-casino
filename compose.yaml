@@ -1,11 +1,16 @@
 services:
   web:
-    image: php:8.2-apache
+    build: 
+      context: .
+      dockerfile: ./php/Dockerfile
     container_name: hotel_web
     ports:
       - "8080:80"
     volumes:
-      - ./www:/var/www/html
+      - ./web/public:/var/www/html
+      - ./web/config:/var/www/config
+      - ./web/partials:/var/www/partial
+      - ./web/lang:/var/www/lang
     networks:
       - public
       - backend
@@ -13,7 +18,7 @@ services:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data
     depends_on:
-      - ai
+      # - ai
       - db
     deploy:
       resources:
@@ -32,29 +37,31 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
     deploy:
       resources:
         limits:
           memory: 1024M
-  ai:
-    build:
-      context: ollama
-    container_name: "hotel_brain"
-    ports:
-      - "11434:11434"
-    entrypoint: ["/bin/bash", "/entrypoint.sh"]
-    volumes:
-      - ollama_data:/root/.ollama
-      - ./ollama/Modelfile:/root/.ollama/Modelfile
-      - ./ollama/entrypoint.sh:/entrypoint.sh
-    networks:
-      - backend
-    deploy:
-      resources:
-        limits:
-          memory: 3500M
+  # ai:
+  #   build:
+  #     context: .
+  #     dockerfile: ./ollama
+  #   container_name: "hotel_brain"
+  #   ports:
+  #     - "11434:11434"
+  #   entrypoint: ["/bin/bash", "/entrypoint.sh"]
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #     - ./ollama/Modelfile:/root/.ollama/Modelfile
+  #     - ./ollama/entrypoint.sh:/entrypoint.sh
+  #   networks:
+  #     - backend
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 3500M
  
 volumes:
   db_data:
