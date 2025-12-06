@@ -1,0 +1,302 @@
+
+:root {
+    --midnight-violet: #270722;
+    --soft-peach: #ecce8e;
+    --vanilla-custard: #dbcf96;
+    --dry-sage: #c2c6a7;
+    --light-blue: #9ac2c5;
+
+    --font-heading: 'Cinzel', serif;
+    --font-body: 'Montserrat', sans-serif;
+    --font-mono: 'Courier Prime', monospace;
+    
+    --gap: 2rem;
+    --card-radius: 4px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--midnight-violet);
+    color: var(--soft-peach);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-header {
+    text-align: center;
+    padding: 3rem 1rem;
+    border-bottom: 1px solid rgba(194, 198, 167, 0.2);
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.brand-title {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    color: var(--soft-peach);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(236, 206, 142, 0.3);
+    margin-bottom: 0.5rem;
+}
+
+.brand-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--light-blue);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.lang-switch {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+
+.lang-switch a {
+    color: var(--dry-sage);
+    text-decoration: none;
+    margin-left: 1rem;
+    transition: color 0.3s;
+}
+
+.lang-switch a.active, .lang-switch a:hover {
+    color: var(--soft-peach);
+    text-decoration: underline;
+}
+
+/* === SEARCH SECTION === */
+.search-container {
+    max-wIdth: 800px;
+    margin: 0 auto 4rem auto;
+    padding: 0 1rem;
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--dry-sage);
+    padding: 1rem 0;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--vanilla-custard);
+    text-align: center;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-bottom-color: var(--light-blue);
+}
+
+.search-input::placeholder {
+    color: rgba(194, 198, 167, 0.4);
+}
+
+.search-filters {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+/* Кастомні чекбокси */
+.filter-label {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--dry-sage);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s;
+}
+
+.filter-label:hover {
+    color: var(--light-blue);
+}
+
+.filter-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--dry-sage);
+    background: transparent;
+    display: grid;
+    place-content: center;
+}
+
+.filter-checkbox::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    transform: scale(0);
+    background-color: var(--soft-peach);
+    transition: 120ms transform ease-in-out;
+}
+
+.filter-checkbox:checked {
+    border-color: var(--soft-peach);
+}
+
+.filter-checkbox:checked::before {
+    transform: scale(1);
+}
+
+/* === ROOM GRID === */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem 4rem 1rem;
+}
+
+/* === ROOM CARD (Partial Styles) === */
+.room-card {
+    border: 1px solid rgba(194, 198, 167, 0.3);
+    background: rgba(39, 7, 34, 0.5); /* Напівпрозорий фон */
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.room-card:hover {
+    border-color: var(--vanilla-custard);
+    transform: translateY(-5px);
+}
+
+.card-image-wrapper {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background-color: #000;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    filter: sepia(0.4) contrast(1.1);
+    transition: opacity 0.5s, transform 0.5s;
+}
+
+.room-card:hover .card-image {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(236, 206, 142, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.card-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--vanilla-custard);
+}
+
+.card-price {
+    font-family: var(--font-mono);
+    color: var(--light-blue);
+    font-size: 0.9rem;
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    color: var(--dry-sage);
+    margin-bottom: 1rem;
+    height: 3em; /* Обмеження висоти */
+    overflow: hidden;
+}
+
+.card-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    border: 1px solid var(--dry-sage);
+    padding: 2px 6px;
+    color: var(--dry-sage);
+}
+
+.btn-book {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--soft-peach);
+    color: var(--soft-peach);
+    padding: 0.8rem;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-book:hover {
+    background: var(--soft-peach);
+    color: var(--midnight-violet);
+}
+
+/* === UTILS === */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+    position: absolute;
+    right: 0;
+    top: 1rem;
+    color: var(--light-blue);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+.htmx-request .htmx-indicator{
+    opacity: 1;
+}
+
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    border: 1px dashed var(--dry-sage);
+    color: var(--dry-sage);
+    font-family: var(--font-mono);
+}
+
+.site-footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid rgba(194, 198, 167, 0.2);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--dry-sage);
+}

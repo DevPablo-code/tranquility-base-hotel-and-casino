@@ -9,8 +9,9 @@ services:
     volumes:
       - ./web/public:/var/www/html
       - ./web/config:/var/www/config
-      - ./web/partials:/var/www/partial
+      - ./web/partials:/var/www/partials
       - ./web/lang:/var/www/lang
+      - ./web/assets:/var/www/assets
     networks:
       - public
       - backend
