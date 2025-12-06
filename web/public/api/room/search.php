@@ -112,6 +112,10 @@ try {
                 <p>' . htmlspecialchars($ui['no_results']) . '</p>
               </div>';
     }
+
+    $isOob = true;
+    include $partialsPath . 'lang_switcher.php';
+
 } catch (PDOException $e) {
     echo "<div class='no-results' style='border-color: var(--midnight-violet); color: var(--soft-peach);'>" 
          . $ui['system_failure'] . ": " . $e . 

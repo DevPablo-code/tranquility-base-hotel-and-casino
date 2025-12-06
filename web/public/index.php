@@ -49,10 +49,11 @@
     ?>
 
     <header class="site-header">
-        <div class="lang-switch">
-            <a href="<?= getLangUrl('en') ?>" class="<?= $lang_code=='en'?'active':'' ?>">EN</a>
-            <a href="<?= getLangUrl('ua') ?>" class="<?= $lang_code=='ua'?'active':'' ?>">UA</a>
-        </div>
+        <?php 
+            $urlParams = $_GET; 
+            $isOob = false; 
+            include $projectRoot . '/partials/lang_switcher.php'; 
+        ?>
         
         <h1 class="brand-title">Tranquility Base</h1>
         <p class="brand-subtitle">Hotel & Casino • Mare Tranquillitatis</p>
@@ -84,7 +85,6 @@
                         <input type="checkbox" name="features[]" value="<?= $feature['id'] ?>" 
                             class="filter-checkbox"
                             
-                            <?php // Перевіряємо, чи був цей ID в URL ?>
                             <?= (in_array($feature['id'], $checkedFeatures)) ? 'checked' : '' ?>
                             
                             hx-post="/api/room/search.php?lang=<?= $lang_code ?>" 
