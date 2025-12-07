@@ -16,27 +16,41 @@ $featuresList = isset($room['features']) ? explode(',', $room['features']) : [];
     </div>
 
     <div class="card-content">
-        <div class="card-header">
-            <h3 class="card-title"><?= htmlspecialchars($room['title']) ?></h3>
+    <div class="card-header">
+        <h3 class="card-title"><?= htmlspecialchars($room['title']) ?></h3>
+        
+        <div class="card-meta">
             <span class="card-price">
-                <?= (int)$room['price'] ?> <?= $ui['currency'] ?? 'CR' ?>
+                <?= (int)$room['price'] ?><small><?= $ui['currency'] ?? 'CR' ?></small>
             </span>
+            
+            <div class="card-capacity">
+                <?= $room['capacity'] ?> <?= $ui['guests_label'] ?>
+            </div>
         </div>
-
-        <p class="card-desc">
-            <?= htmlspecialchars($room['description']) ?>
-        </p>
-
-        <div class="card-features">
-            <?php foreach($featuresList as $feat): ?>
-                <span class="feature-tag"><?= htmlspecialchars(trim($feat)) ?></span>
-            <?php endforeach; ?>
-        </div>
-
-        <button class="btn-book"
-                hx-post="/api/room/book.php?id=<?= $room['id'] ?>"
-                hx-swap="outerHTML">
-            <?= $ui['book_btn'] ?? 'Reserve' ?>
-        </button>
     </div>
+
+    <p class="card-desc">
+        <?= htmlspecialchars($room['description']) ?>
+    </p>
+    
+    <div class="card-features">
+        <?php foreach($featuresList as $feat): ?>
+            <span class="feature-tag"><?= htmlspecialchars(trim($feat)) ?></span>
+        <?php endforeach; ?>
+    </div>
+
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <button hx-post="/api/room/book_form.php?id=<?= $room['id'] ?>" ...>
+            <?= $ui['book_btn'] ?>
+        </button>
+    <?php else: ?>
+        <button hx-get="/api/auth/login_modal.php?lang=<?= $lang_code ?? 'en' ?>" 
+                hx-target="body" 
+                hx-swap="beforeend"
+                class="btn-book">
+            <?= $ui['book_btn'] ?>
+        </button>
+    <?php endif; ?>
+</div>
 </div>

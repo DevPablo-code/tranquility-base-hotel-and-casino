@@ -2,6 +2,7 @@
 :root {
     --midnight-violet: #270722;
     --soft-peach: #ecce8e;
+    --gold: #ecce8e;
     --vanilla-custard: #dbcf96;
     --dry-sage: #c2c6a7;
     --light-blue: #9ac2c5;
@@ -73,7 +74,6 @@ body {
     text-decoration: underline;
 }
 
-/* === SEARCH SECTION === */
 .search-container {
     max-wIdth: 800px;
     margin: 0 auto 4rem auto;
@@ -113,7 +113,6 @@ body {
     gap: 1.5rem;
 }
 
-/* Кастомні чекбокси */
 .filter-label {
     cursor: pointer;
     font-family: var(--font-mono);
@@ -156,7 +155,6 @@ body {
     transform: scale(1);
 }
 
-/* === ROOM GRID === */
 .room-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -166,10 +164,9 @@ body {
     padding: 0 1rem 4rem 1rem;
 }
 
-/* === ROOM CARD (Partial Styles) === */
 .room-card {
     border: 1px solid rgba(194, 198, 167, 0.3);
-    background: rgba(39, 7, 34, 0.5); /* Напівпрозорий фон */
+    background: rgba(39, 7, 34, 0.5);
     transition: transform 0.3s, border-color 0.3s;
 }
 
@@ -206,29 +203,59 @@ body {
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
     border-bottom: 1px solid rgba(236, 206, 142, 0.2);
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.8rem;
 }
 
 .card-title {
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--vanilla-custard);
+    line-height: 1.2;
+    max-width: 65%;
+}
+
+.card-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .card-price {
     font-family: var(--font-mono);
     color: var(--light-blue);
-    font-size: 0.9rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 0 0 8px rgba(154, 194, 197, 0.4);
+}
+
+.card-price small {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-left: 2px;
+}
+
+.card-capacity {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    color: var(--dry-sage);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.8;
 }
 
 .card-desc {
     font-size: 0.9rem;
     color: var(--dry-sage);
     margin-bottom: 1rem;
-    height: 3em; /* Обмеження висоти */
+    height: 3em;
     overflow: hidden;
 }
 
@@ -267,7 +294,6 @@ body {
     color: var(--midnight-violet);
 }
 
-/* === UTILS === */
 .htmx-indicator {
     opacity: 0;
     transition: opacity 200ms ease-in;
@@ -291,6 +317,52 @@ body {
     font-family: var(--font-mono);
 }
 
+.search-sort {
+    background-color: transparent;
+    color: var(--soft-peach);
+    border: 1px solid var(--dry-sage);
+    padding: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    text-transform: uppercase;
+}
+
+.search-sort option {
+    background-color: var(--midnight-violet);
+    color: var(--soft-peach);
+}
+
+.search-sort:focus {
+    border-color: var(--light-blue);
+}
+
+.search-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-left: 1px solid rgba(194, 198, 167, 0.2);
+    padding-left: 2rem;
+}
+
+.sort-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--dry-sage);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
 .site-footer {
     margin-top: auto;
     text-align: center;
@@ -299,4 +371,159 @@ body {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--dry-sage);
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(5, 5, 5, 0.9); /* void з прозорістю */
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+}
+
+.modal-content {
+    background: var(--midnight-violet);
+    border: 1px solid rgba(212, 175, 55, 0.3); /* gold */
+    padding: 3rem;
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+}
+
+.auth-title {
+    font-family: var(--font-heading);
+    color: var(--gold);
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--dry-sage);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(194, 198, 167, 0.2); /* dry-sage */
+    padding: 1rem;
+    color: var(--soft-peach);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: var(--gold);
+}
+
+.btn-auth {
+    width: 100%;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 1rem;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-auth:hover {
+    background: var(--gold);
+    color: var(--midnight-violet);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--dry-sage);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal-close:hover {
+    color: var(--gold);
+}
+
+.auth-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--dry-sage);
+}
+
+.link-action {
+    color: var(--light-blue);
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.user-status {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    z-index: 50;
+    color: var(--dry-sage);
+}
+
+.user-name {
+    color: var(--gold);
+    margin-right: 1rem;
+}
+
+.btn-login-header {
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    color: var(--gold);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    transition: all 0.3s;
+}
+
+.btn-login-header:hover {
+    border-color: var(--light-blue);
+    color: var(--light-blue);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

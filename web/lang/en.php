@@ -6,5 +6,22 @@ return [
     'currency' => "credits",
     'book_btn' => "Book Sequence",
     'room_label' => "ROOM",
-    'footer_quote' => "Mark speaking, please tell me how may I direct your call?"
+    'footer_quote' => "Mark speaking, please tell me how may I direct your call?",
+    'sort_label' => "Sort Sequence",
+    'sort_price_asc' => "Price: Low to High",
+    'sort_price_desc' => "Price: High to Low",
+    'sort_cap_asc' => "Capacity: Small first",
+    'sort_cap_desc' => "Capacity: Large first",
+    'guests_label' => "Guests",
+    'nav_identify' => "[ IDENTIFY ]",
+    'nav_logout'   => "[ LOGOUT ]",
+    'nav_hello'    => ":: Guest ::",
+    'auth_title'   => "Identity Check",
+    'auth_user'    => "Callsign (Username)",
+    'auth_pass'    => "Passcode",
+    'auth_submit'  => "Authenticate",
+    'auth_new'     => "New guest?",
+    'auth_old'     => "Already have ID?",
+    'auth_reg'     => "Register",
+    'auth_error'   => "Access Denied: Invalid credentials."
 ];

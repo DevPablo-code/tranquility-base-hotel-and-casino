@@ -1,16 +1,18 @@
 <?php 
     $projectRoot = __DIR__ . '/../';
-    $lang_code = $_GET['lang'] ?? 'en';
-    $transFile = $projectRoot . 'lang/' . $lang_code . '.php';
-    $ui = file_exists($transFile) ? require $transFile : require $projectRoot . 'lang/en.php';
 
     $dbPath = $projectRoot . '/config/db.php';
+
+    require_once $projectRoot . '/config/lang.php';
 
     if (file_exists($dbPath)) {
         require_once $dbPath;
     } else {
-        die("Configuration Error");
-    }   
+        die($ui["system_failure"]);
+    }
+
+    session_start();
+    $user = $_SESSION['username'] ?? null;
 
     $stmtFeatures = $pdo->prepare("
         SELECT f.id, ft.name 
@@ -24,6 +26,7 @@
     $allFeatures = $stmtFeatures->fetchAll(PDO::FETCH_ASSOC);
 
     $checkedFeatures = $_GET['features'] ?? [];
+    $currentSort = $_GET['sort'] ?? 'price_asc';
 ?>
 
 <!DOCTYPE html>
@@ -49,6 +52,20 @@
     ?>
 
     <header class="site-header">
+        <div class="user-status">
+            <?php if ($user): ?>
+                <span class="user-name">:: <?= htmlspecialchars($user) ?> ::</span>
+                <a href="/api/auth/logout.php" style="color: var(--dry-sage); text-decoration: none;"><?= $ui["nav_logout"] ?></a>
+            <?php else: ?>
+                <button hx-get="/api/auth/login_modal.php" 
+                        hx-target="body" 
+                        hx-swap="beforeend"
+                        class="btn-login-header">
+                    <?= $ui["nav_identify"] ?>
+                </button>
+            <?php endif; ?>
+        </div>
+
         <?php 
             $urlParams = $_GET; 
             $isOob = false; 
@@ -79,22 +96,48 @@
                     </span>
                 </div>
 
-            <div class="search-filters">
-                <?php foreach ($allFeatures as $feature): ?>
-                    <label class="filter-label">
-                        <input type="checkbox" name="features[]" value="<?= $feature['id'] ?>" 
-                            class="filter-checkbox"
-                            
-                            <?= (in_array($feature['id'], $checkedFeatures)) ? 'checked' : '' ?>
-                            
-                            hx-post="/api/room/search.php?lang=<?= $lang_code ?>" 
-                            hx-target="#room-grid" 
-                            hx-include="#search-form">
-                        
-                        <?= htmlspecialchars($feature['name']) ?>
-                    </label>
-                <?php endforeach; ?>
-            </div>
+            <div class="search-options">
+        
+        <div class="search-filters">
+            <?php foreach ($allFeatures as $feature): ?>
+                <label class="filter-label">
+                    <input type="checkbox" name="features[]" value="<?= $feature['id'] ?>" 
+                           class="filter-checkbox"
+                           <?= (in_array($feature['id'], $checkedFeatures)) ? 'checked' : '' ?>
+                           hx-post="/api/room/search.php?lang=<?= $lang_code ?>" 
+                           hx-target="#room-grid" 
+                           hx-include="#search-form">
+                    
+                    <?= htmlspecialchars($feature['name']) ?>
+                </label>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="sort-container">
+            <label class="sort-label"><?= $ui['sort_label'] ?>:</label>
+            
+            <select name="sort" 
+                    class="search-sort"
+                    hx-post="/api/room/search.php?lang=<?= $lang_code ?>" 
+                    hx-target="#room-grid" 
+                    hx-include="#search-form">
+                
+                <option value="price_asc" <?= ($currentSort == 'price_asc') ? 'selected' : '' ?>>
+                    <?= $ui['sort_price_asc'] ?>
+                </option>
+                <option value="price_desc" <?= ($currentSort == 'price_desc') ? 'selected' : '' ?>>
+                    <?= $ui['sort_price_desc'] ?>
+                </option>
+                <option value="cap_asc" <?= ($currentSort == 'cap_asc') ? 'selected' : '' ?>>
+                    <?= $ui['sort_cap_asc'] ?>
+                </option>
+                <option value="cap_desc" <?= ($currentSort == 'cap_desc') ? 'selected' : '' ?>>
+                    <?= $ui['sort_cap_desc'] ?>
+                </option>
+            </select>
+        </div>
+
+    </div>
             </form>
         </div>
 
@@ -108,7 +151,7 @@
     </main>
 
     <footer class="site-footer">
-        <p>"<?= $ui['footer_quote'] ?? '"Mark speaking, please tell me how may I direct your call?' ?>"</p>
+        <p>"<?= $ui['footer_quote'] ?>"</p>
     </footer>
 
 </body>

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     number VARCHAR(10) NOT NULL UNIQUE,
     price DECIMAL(10, 2) NOT NULL,
+    capacity INT NOT NULL DEFAULT 2,
     image VARCHAR(255) NULL,
     status ENUM('free', 'occupied', 'cleaning') DEFAULT 'free',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -68,6 +69,20 @@ CREATE TABLE IF NOT EXISTS room_features (
     FOREIGN KEY (feature_id) REFERENCES features(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    room_id INT NOT NULL,
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'confirmed',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS audit_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NULL,
@@ -100,19 +115,19 @@ INSERT INTO feature_translations (feature_id, language_id, name) VALUES
 (4, 1, 'Retro Terminal'), (4, 2, 'Ретро термінал'),
 (5, 1, 'Mini-bar'), (5, 2, 'Міні-бар');
 
-INSERT INTO rooms (id, number, price, image, status) VALUES (1, '505', 450.00, 'room_505.jpg', 'free');
+INSERT INTO rooms (id, number, price, capacity, image, status) VALUES (1, '505', 450.00, 4, 'room_505.jpg', 'free');
 INSERT INTO room_translations (room_id, language_id, title, description) VALUES 
 (1, 1, 'Crater View Suite', 'A stunning suite overlooking the Mare Tranquillitatis impact crater. Features 70s decor.'),
 (1, 2, 'Люкс з видом на кратер', "Розкішний люкс з видом на кратер Моря Спокою. Інтер'єр у стилі 70-х.");
 INSERT INTO room_features (room_id, feature_id) VALUES (1, 1), (1, 2), (1, 4);
 
-INSERT INTO rooms (id, number, price, image, status) VALUES (2, '101', 120.00, 'room_101.jpg', 'free');
+INSERT INTO rooms (id, number, price, capacity, image, status) VALUES (2, '101', 120.00, 1, 'room_101.jpg', 'free');
 INSERT INTO room_translations (room_id, language_id, title, description) VALUES 
 (2, 1, 'Standard Module', 'Compact living module. Perfect for short stays. Close to the taqueria.'),
 (2, 2, 'Стандартний модуль', 'Компактний житловий модуль. Ідеально для коротких візитів. Близько до такером.');
 INSERT INTO room_features (room_id, feature_id) VALUES (2, 1), (2, 5);
 
-INSERT INTO rooms (id, number, price, image, status) VALUES (3, '303', 800.00, 'room_303.jpg', 'occupied');
+INSERT INTO rooms (id, number, price, capacity, image, status) VALUES (3, '303', 800.00, 2, 'room_303.jpg', 'occupied');
 INSERT INTO room_translations (room_id, language_id, title, description) VALUES 
 (3, 1, 'Presidential Suite', 'The most exclusive room on the dark side of the moon.'),
 (3, 2, 'Президентський люкс', 'Найексклюзивніший номер на темному боці місяця.');

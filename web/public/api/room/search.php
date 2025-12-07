@@ -4,7 +4,6 @@ $projectRoot = dirname(__DIR__, 3);
 $dbPath = $projectRoot . '/config/db.php';
 
 $partialsPath = $projectRoot . '/partials/'; 
-$langPath = $projectRoot . '/lang/';
 
 if (file_exists($dbPath)) {
     require_once $dbPath;
@@ -12,11 +11,7 @@ if (file_exists($dbPath)) {
     die("Configuration Error");
 }
 
-$lang_code = $_GET['lang'] ?? 'en';
-$transFile = $langPath . $lang_code . '.php';
-
-$ui = file_exists($transFile) ? require $transFile : require $langPath . 'en.php';
-
+require_once $projectRoot . '/config/lang.php';
 $query = $_POST['query'] ?? '';
 $features = $_POST['features'] ?? [];
 
@@ -64,6 +59,15 @@ if (!empty($features)) {
 
 $whereSQL = implode(' AND ', $conditions);
 
+$sortOption = $_POST['sort'] ?? 'price_asc';
+
+$orderBySQL = match ($sortOption) {
+    'price_desc' => 'r.price DESC',
+    'cap_asc'    => 'r.capacity ASC',
+    'cap_desc'   => 'r.capacity DESC',
+    default      => 'r.price ASC',
+};
+
 $sql = "SELECT r.*, rt.title, rt.description, 
         GROUP_CONCAT(ft.name SEPARATOR ',') as features
         FROM rooms r
@@ -80,7 +84,7 @@ $sql = "SELECT r.*, rt.title, rt.description,
         WHERE l.code = :lang AND $whereSQL
         
         GROUP BY r.id, rt.title, rt.description, r.number, r.price, r.image, r.status
-        ORDER BY r.price ASC";
+        ORDER BY $orderBySQL";
 
 try {
     $stmt = $pdo->prepare($sql);
