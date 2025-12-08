@@ -19,6 +19,7 @@ services:
     environment:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       # - ai
       - db

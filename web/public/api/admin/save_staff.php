@@ -12,6 +12,12 @@ $salary = $_POST['salary'];
 $employmentDate = $_POST['employment_date'];
 $isActive = isset($_POST['is_active']) ? 1 : 0;
 
+if ($salary < 0) {
+    http_response_code(400);
+    echo "<div style='color:var(--danger);'>ERROR: Salary cannot be negative.</div>";
+    exit;
+}
+
 try {
     $pdo->beginTransaction();
 

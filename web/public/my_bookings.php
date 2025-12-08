@@ -34,7 +34,7 @@ include $projectRoot . '/partials/header.php';
     <?php if (empty($userBookings)): ?>
         <p class="no-results"><?= ($lang_code == 'ua') ? 'Активних бронювань немає.' : 'No active reservations found.' ?></p>
     <?php else: ?>
-        <div class="booking-list-container" style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto;">
+        <div class="booking-list-container" style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto; margin-bottom: 2rem;">
             
             <?php foreach ($userBookings as $booking): 
                 $statusColor = ($booking['status'] == 'confirmed' || $booking['status'] == 'paid') ? 'var(--light-blue)' : 'var(--dry-sage)';

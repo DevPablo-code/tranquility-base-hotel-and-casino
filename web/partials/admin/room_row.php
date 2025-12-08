@@ -8,6 +8,7 @@
     </td>
     <td><?= (int)$r['price'] ?></td>
     <td><?= $r['capacity'] ?></td>
+    <td><?= $r['features_list']; ?></td>
     <td style="color: <?= $r['status']=='free'?'var(--light-blue)':'var(--danger)' ?>; font-size:0.7rem;">
         <?= strtoupper($r['status']) ?>
     </td>

@@ -40,7 +40,9 @@ if ($id) {
         </div>
         <div class="form-group">
             <label class="form-label">Salary (Credits)</label>
-            <input type="number" step="0.01" name="salary" value="<?= htmlspecialchars($staff['salary'] ?? 0.00) ?>" class="form-input" required>
+            <input type="number" step="0.01" name="salary" min="0"
+                   value="<?= htmlspecialchars($staff['salary'] ?? 0.00) ?>" 
+                   class="form-input" required>
         </div>
     </div>
 

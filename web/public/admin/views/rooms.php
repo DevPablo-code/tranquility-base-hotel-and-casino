@@ -40,6 +40,7 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <th>Title (EN)</th>
             <th>Price</th>
             <th>Cap.</th>
+            <th>Features</th>
             <th>Status</th>
             <th>Controls</th>
         </tr>
