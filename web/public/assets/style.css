@@ -506,6 +506,16 @@ body {
     margin-right: 1rem;
 }
 
+.user-link {
+    color: var(--dry-sage); 
+    text-decoration: none; 
+    margin-right: 0.5rem; 
+    transition: color 0.3s;
+}
+.user-link:hover {
+    color: var(--light-blue);
+}
+
 .btn-login-header {
     background: none;
     border: none;
@@ -526,4 +536,407 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.booking-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--dry-sage);
+    animation: fadeIn 0.3s ease-in;
+}
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.booking-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(194, 198, 167, 0.3);
+    color: var(--soft-peach);
+    padding: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.booking-input:focus {
+    border-color: var(--light-blue);
+}
+
+.booking-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(180deg);
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.booking-label {
+    display: block;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--dry-sage);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.1em;
+}
+
+.booking-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--dry-sage);
+    color: var(--dry-sage);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+}
+
+.btn-secondary:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn-confirm {
+    flex: 2;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-confirm:hover {
+    background: var(--gold);
+    color: var(--midnight-violet);
+}
+
+.booking-success {
+    background: var(--gold);
+    color: var(--midnight-violet);
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--gold);
+    animation: fadeIn 0.5s;
+}
+
+.booking-success h4 {
+    font-family: var(--font-heading);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+}
+
+.booking-details {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+
+.intercom-trigger {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--midnight-violet);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 1.5rem;
+}
+
+.intercom-trigger:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+}
+
+.intercom-status {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #4ade80;
+    border-radius: 50%;
+    border: 2px solid var(--midnight-violet);
+    animation: pulse 2s infinite;
+}
+
+.intercom-panel {
+    position: fixed;
+    bottom: 7rem;
+    right: 2rem;
+    width: 350px;
+    max-width: 90vw;
+    background-color: rgba(5, 5, 5, 0.95);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    z-index: 99;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    
+    transition: opacity 0.3s, transform 0.3s;
+    transform-origin: bottom right;
+}
+
+.intercom-panel.hidden {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    pointer-events: none;
+}
+
+.intercom-header {
+    padding: 1rem;
+    background: rgba(212, 175, 55, 0.1);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.intercom-title {
+    font-family: var(--font-heading);
+    color: var(--gold);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+}
+
+.intercom-subtitle {
+    font-family: var(--font-mono);
+    color: var(--dry-sage);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+}
+
+.intercom-close {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.intercom-history {
+    height: 300px;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) var(--midnight-violet);
+}
+
+.intercom-form {
+    padding: 0.8rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    gap: 0.5rem;
+    background-color: var(--midnight-violet);
+}
+
+.intercom-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    color: var(--soft-peach);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.intercom-input::placeholder {
+    color: rgba(194, 198, 167, 0.4);
+}
+
+.intercom-send {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.intercom-send:hover {
+    transform: translateX(3px);
+}
+
+.intercom-footer {
+    background-color: #000;
+    text-align: center;
+    padding: 4px;
+}
+
+.btn-purge {
+    background: none;
+    border: none;
+    color: var(--dry-sage);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+}
+
+.btn-purge:hover {
+    color: #ff4444;
+}
+
+#ai-loading {
+    padding: 0 1rem 0.5rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--light-blue);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+.chat-msg {
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    max-width: 90%;
+    overflow-wrap: break-word; 
+    word-wrap: break-word;
+}
+
+.chat-msg.user {
+    margin-left: auto;
+    text-align: right;
+}
+
+.chat-bubble-user {
+    display: inline-block;
+    background: rgba(236, 206, 142, 0.1);
+    border: 1px solid var(--soft-peach);
+    color: var(--soft-peach);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(236, 206, 142, 0.1);
+}
+
+.chat-msg.mark {
+    margin-right: auto; 
+    text-align: left;
+    color: var(--vanilla-custard);
+    border-left: 2px solid var(--light-blue);
+    padding-left: 0.8rem;
+}
+
+.mark-label {
+    color: var(--light-blue);
+    font-weight: bold;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+}
+
+.cursor-blink {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background-color: var(--light-blue);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.mark-action {
+    color: var(--dry-sage);
+    font-style: italic;
+    font-size: 0.85em; 
+    opacity: 0.8;
+    margin: 0 5px;
+    display: inline-block;
+}
+
+.carousel-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Приховує слайди, які вийшли за межі */
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.4s ease-in-out; /* Анімація переходу */
+    height: 100%;
+}
+
+.carousel-slide {
+    min-width: 100%; /* Кожен слайд займає 100% ширини контейнера */
+    flex-shrink: 0;
+    height: 100%;
+    position: relative;
+}
+
+.carousel-slide .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 1.5rem;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.carousel-btn:hover {
+    opacity: 1;
+}
+
+.carousel-btn.prev {
+    left: 0;
+    border-radius: 0 5px 5px 0;
+}
+
+.carousel-btn.next {
+    right: 0;
+    border-radius: 5px 0 0 5px;
 }

@@ -10,6 +10,7 @@ services:
       - ./web/public:/var/www/html
       - ./web/config:/var/www/config
       - ./web/partials:/var/www/partials
+      - ./web/includes:/var/www/includes
       - ./web/lang:/var/www/lang
       - ./web/assets:/var/www/assets
     networks:
@@ -45,28 +46,53 @@ services:
       resources:
         limits:
           memory: 1024M
-  # ai:
-  #   build:
-  #     context: .
-  #     dockerfile: ./ollama
-  #   container_name: "hotel_brain"
-  #   ports:
-  #     - "11434:11434"
-  #   entrypoint: ["/bin/bash", "/entrypoint.sh"]
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #     - ./ollama/Modelfile:/root/.ollama/Modelfile
-  #     - ./ollama/entrypoint.sh:/entrypoint.sh
-  #   networks:
-  #     - backend
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 3500M
+  bank:
+    build: ./payment-service
+    container_name: hotel_bank
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+  cdn:
+    build: ./cdn-service
+    container_name: hotel_cdn
+    ports:
+      - "4000:4000" 
+    volumes:
+      - cdn_data:/root/uploads
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+  ai:
+    build:
+      context: .
+      dockerfile: ./ollama
+    container_name: "hotel_brain"
+    ports:
+      - "11434:11434"
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./ollama/Modelfile:/root/.ollama/Modelfile
+      - ./ollama/entrypoint.sh:/entrypoint.sh
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 3500M
  
 volumes:
   db_data:
   ollama_data:
+  cdn_data:
 
 networks:
   public:

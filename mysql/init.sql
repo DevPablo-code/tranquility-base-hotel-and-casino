@@ -15,7 +15,23 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (username, password_hash, role) 
-VALUES ('admin', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'admin');
+VALUES ('admin', '$2a$12$IMSZxWG91FvM66QmmioyYuaapwsOFtGfflUuw47/wA8egd33zmOPy', 'admin');
+
+CREATE TABLE staff (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    position VARCHAR(50) NOT NULL,
+    salary DECIMAL(10, 2) NOT NULL,
+    employment_date DATE NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO staff (full_name, position, salary, employment_date, is_active) VALUES
+('Mark O. G. S.', 'Concierge/System Manager', 90000.00, '2025-01-01', TRUE),
+('S. L. Thompson', 'Security Officer', 55000.00, '2024-11-15', TRUE),
+('Alex A. P.', 'Maintenance Engineer', 62000.00, '2025-02-20', TRUE),
+('Jane Doe', 'On Leave', 0.00, '2024-05-01', FALSE);
 
 CREATE TABLE IF NOT EXISTS languages (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -72,15 +88,38 @@ CREATE TABLE IF NOT EXISTS room_features (
 CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    passport_no VARCHAR(20) NOT NULL,
+    payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
+    transaction_id VARCHAR(50) NULL,
     room_id INT NOT NULL,
     check_in DATE NOT NULL,
     check_out DATE NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
+    notes TEXT NULL,
     status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'confirmed',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS photos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    alt_text VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS room_photos (
+    room_id INT NOT NULL,
+    photo_id INT NOT NULL,
+    is_primary BOOLEAN DEFAULT 0,
+    sort_order INT DEFAULT 0,
+    
+    PRIMARY KEY (room_id, photo_id),
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE,
+    FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS audit_logs (
@@ -132,6 +171,66 @@ INSERT INTO room_translations (room_id, language_id, title, description) VALUES
 (3, 1, 'Presidential Suite', 'The most exclusive room on the dark side of the moon.'),
 (3, 2, 'Президентський люкс', 'Найексклюзивніший номер на темному боці місяця.');
 INSERT INTO room_features (room_id, feature_id) VALUES (3, 1), (3, 2), (3, 3), (3, 5);
+
+INSERT INTO photos (id, filename, alt_text) VALUES 
+(1, 'room_505.jpg', 'Crater View Suite Main'),
+(2, 'room_101.jpg', 'Standard Module Main'),
+(3, 'room_303.jpg', 'Presidential Suite Main'),
+(4, 'bathroom_lux.jpg', 'Luxury Bathroom with Gold Faucets'),
+(5, 'view_crater.jpg', 'View of Mare Tranquillitatis');
+
+INSERT INTO room_photos (room_id, photo_id, is_primary, sort_order) VALUES 
+(1, 1, 1, 1),
+(1, 4, 0, 2),
+(1, 5, 0, 3);
+
+INSERT INTO room_photos (room_id, photo_id, is_primary) VALUES (2, 2, 1);
+
+INSERT INTO room_photos (room_id, photo_id, is_primary) VALUES 
+(3, 3, 1),
+(3, 4, 0);
+
+INSERT INTO rooms (id, number, price, capacity, image, status) VALUES (4, '202', 250.00, 2, 'room_202.jpg', 'free');
+
+INSERT INTO room_translations (room_id, language_id, title, description) VALUES 
+(4, 1, 'Hydroponic Garden Pod', 'Relax surrounded by lunar flora. Oxygen-rich atmosphere and soft green lighting.'),
+(4, 2, 'Модуль Гідропонний Сад', 'Відпочивайте в оточенні місячної флори. Збагачена киснем атмосфера та м''яке зелене освітлення.');
+
+INSERT INTO room_features (room_id, feature_id) VALUES (4, 1), (4, 5);
+
+INSERT INTO rooms (id, number, price, capacity, image, status) VALUES (5, '777', 1500.00, 6, 'room_777.jpg', 'cleaning');
+
+INSERT INTO room_translations (room_id, language_id, title, description) VALUES 
+(5, 1, 'High Roller Penthouse', 'Direct access to the casino floor. Includes a private poker table and velvet interior.'),
+(5, 2, 'Пентхаус Хайроллера', 'Прямий доступ до казино. Включає приватний стіл для покеру та оксамитовий інтер''єр.');
+
+INSERT INTO room_features (room_id, feature_id) VALUES (5, 1), (5, 2), (5, 3), (5, 4), (5, 5);
+
+INSERT INTO rooms (id, number, price, capacity, image, status) VALUES (6, '009', 55.00, 1, 'room_009.jpg', 'free');
+
+INSERT INTO room_translations (room_id, language_id, title, description) VALUES 
+(6, 1, 'Cryo-Sleep Capsule', 'Minimalist soundproof capsule for deep rest. No windows, just silence.'),
+(6, 2, 'Капсула Кріо-Сну', 'Мінімалістична шумоізольована капсула для глибокого відпочинку. Без вікон, тільки тиша.');
+
+INSERT INTO room_features (room_id, feature_id) VALUES (6, 1), (6, 4);
+
+INSERT INTO photos (id, filename, alt_text) VALUES 
+(6, 'room_202.jpg', 'Greenhouse Room View'),
+(7, 'room_777.jpg', 'Golden Casino Penthouse Interior'),
+(8, 'room_009.jpg', 'White Minimalist Capsule'),
+(9, 'poker_table.jpg', 'Private Poker Table');
+
+INSERT INTO room_photos (room_id, photo_id, is_primary, sort_order) VALUES (4, 6, 1, 1);
+
+INSERT INTO room_photos (room_id, photo_id, is_primary, sort_order) VALUES 
+(5, 7, 1, 1),
+(5, 9, 0, 2), 
+(5, 4, 0, 3),
+(5, 5, 0, 4);
+
+INSERT INTO room_photos (room_id, photo_id, is_primary, sort_order) VALUES (6, 8, 1, 1);
+
+
 
 DELIMITER $$
 CREATE FUNCTION levenshtein( s1 VARCHAR(255) CHARSET utf8mb4, s2 VARCHAR(255) CHARSET utf8mb4)

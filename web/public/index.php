@@ -12,7 +12,6 @@
     }
 
     session_start();
-    $user = $_SESSION['username'] ?? null;
 
     $stmtFeatures = $pdo->prepare("
         SELECT f.id, ft.name 
@@ -29,52 +28,7 @@
     $currentSort = $_GET['sort'] ?? 'price_asc';
 ?>
 
-<!DOCTYPE html>
-<html lang="<?= $lang_code ?>">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tranquility Base Hotel & Casino</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400&family=Courier+Prime&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/assets/style.css">
-    
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-</head>
-<body>
-    <?php
-        function getLangUrl($newLang) {
-            $params = $_GET;
-            $params['lang'] = $newLang;
-            return '?' . http_build_query($params);
-        }
-    ?>
-
-    <header class="site-header">
-        <div class="user-status">
-            <?php if ($user): ?>
-                <span class="user-name">:: <?= htmlspecialchars($user) ?> ::</span>
-                <a href="/api/auth/logout.php" style="color: var(--dry-sage); text-decoration: none;"><?= $ui["nav_logout"] ?></a>
-            <?php else: ?>
-                <button hx-get="/api/auth/login_modal.php" 
-                        hx-target="body" 
-                        hx-swap="beforeend"
-                        class="btn-login-header">
-                    <?= $ui["nav_identify"] ?>
-                </button>
-            <?php endif; ?>
-        </div>
-
-        <?php 
-            $urlParams = $_GET; 
-            $isOob = false; 
-            include $projectRoot . '/partials/lang_switcher.php'; 
-        ?>
-        
-        <h1 class="brand-title">Tranquility Base</h1>
-        <p class="brand-subtitle">Hotel & Casino • Mare Tranquillitatis</p>
-    </header>
+<?php include $projectRoot . '/partials/header.php'; ?>
 
     <main>
         <div class="search-container">
@@ -134,6 +88,12 @@
                 <option value="cap_desc" <?= ($currentSort == 'cap_desc') ? 'selected' : '' ?>>
                     <?= $ui['sort_cap_desc'] ?>
                 </option>
+                <option value="feat_asc" <?= ($currentSort == 'feat_asc') ? 'selected' : '' ?>>
+                    <?= $ui['sort_feat_asc'] ?>
+                </option>
+                <option value="feat_desc" <?= ($currentSort == 'feat_desc') ? 'selected' : '' ?>>
+                    <?= $ui['sort_feat_desc'] ?>
+                </option>
             </select>
         </div>
 
@@ -150,9 +110,11 @@
         </div>
     </main>
 
-    <footer class="site-footer">
-        <p>"<?= $ui['footer_quote'] ?>"</p>
-    </footer>
-
+    <?php 
+include $projectRoot . '/partials/footer.php';
+?>
+    <?php 
+include $projectRoot . '/partials/chat_panel.php';
+?>
 </body>
 </html>

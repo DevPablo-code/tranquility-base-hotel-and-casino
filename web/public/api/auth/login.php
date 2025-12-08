@@ -25,6 +25,10 @@ if ($user && password_verify($password, $user['password_hash'])) {
     $_SESSION['username'] = $user['username'];
     $_SESSION['role'] = $user['role'];
 
+    require_once $projectRoot . '/includes/functions.php';
+
+    logAction($pdo, $user['id'], 'LOGIN', 'User logged in');
+
     header("HX-Refresh: true");
     exit;
 } else {

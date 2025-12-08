@@ -7,7 +7,7 @@
 </head>
 <body style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center;">
     
-    <div style="font-size: 4rem; color: var(--vanilla-custard); font-family: var(--font-heading);">500</div>
+    <div style="font-size: 4rem; color: var(--vanilla-custard); font-family: var(--font-heading);">505</div>
     
     <h1 class="brand-title" style="font-size: 2rem; margin-bottom: 1rem;">System Malfunction</h1>
     

@@ -1,12 +1,15 @@
 <?php
 $featuresList = isset($room['features']) ? explode(',', $room['features']) : [];
+
+$imgFilename = $room['primary_image'] ?? $room['image'] ?? null;
 ?>
 
 <div class="room-card">
     <div class="card-image-wrapper">
-        <?php if(!empty($room['image'])): ?>
-            <img src="/assets/rooms/<?= htmlspecialchars($room['image']) ?>" 
+        <?php if(!empty($room['primary_image'])): ?>
+            <img src="http://localhost:4000/images/<?= htmlspecialchars($imgFilename) ?>" 
                  class="card-image" 
+                 loading="lazy"
                  alt="<?= htmlspecialchars($room['title']) ?>">
         <?php else: ?>
             <div style="height:100%; display:flex; align-items:center; justify-content:center; color:var(--dry-sage);">
@@ -41,9 +44,11 @@ $featuresList = isset($room['features']) ? explode(',', $room['features']) : [];
     </div>
 
     <?php if (isset($_SESSION['user_id'])): ?>
-        <button hx-post="/api/room/book_form.php?id=<?= $room['id'] ?>" ...>
-            <?= $ui['book_btn'] ?>
-        </button>
+    <button hx-get="/api/room/book_form.php?id=<?= $room['id'] ?>"
+            hx-swap="outerHTML"
+            class="btn-book">
+        <?= $ui['book_btn'] ?? 'Reserve' ?>
+    </button>
     <?php else: ?>
         <button hx-get="/api/auth/login_modal.php?lang=<?= $lang_code ?? 'en' ?>" 
                 hx-target="body" 
