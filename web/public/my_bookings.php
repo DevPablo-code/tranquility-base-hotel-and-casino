@@ -44,6 +44,8 @@ include $projectRoot . '/partials/header.php';
             <div id="booking-<?= $bookingId ?>" class="booking-item" style="border: 1px solid <?= $statusColor ?>; padding: 1.5rem; background: var(--midnight-violet); border-radius: 8px;">
                 <h3 style="color: var(--vanilla-custard); font-family: var(--font-heading); margin-bottom: 0.5rem;"><?= htmlspecialchars($booking['title']) ?> (<?= htmlspecialchars($booking['number']) ?>)</h3>
                 <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--dry-sage);">
+                    Guest: <strong style="color: var(--soft-peach);"><?= htmlspecialchars($booking['first_name'] . ' ' . $booking['last_name']) ?></strong><br>
+
                     Check-in: <?= htmlspecialchars($booking['check_in']) ?> | Check-out: <?= htmlspecialchars($booking['check_out']) ?><br>
                     Status: <strong style="color: <?= $statusColor ?>;"><?= htmlspecialchars($booking['status']) ?></strong><br>
                     Total Paid: <strong style="color: var(--gold);"><?= (int)$totalPrice ?> <?= $ui['currency'] ?></strong>

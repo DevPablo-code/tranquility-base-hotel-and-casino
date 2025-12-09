@@ -33,6 +33,8 @@ return [
     'lbl_notes' => "Особливі побажання",
     'btn_confirm' => "ПІДТВЕРДИТИ",
     'btn_cancel' => "СКАСУВАТИ",
+    'lbl_firstname' => "Ім'я",
+    'lbl_lastname'  => "Прізвище",
     'lbl_passport' => "Passport ID / ID Card",
     'lbl_card_num' => "Credit Chip Number",
     'lbl_card_exp' => "EXP",

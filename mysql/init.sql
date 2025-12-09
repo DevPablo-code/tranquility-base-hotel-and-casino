@@ -89,8 +89,10 @@ CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     phone VARCHAR(20) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     passport_no VARCHAR(20) NOT NULL,
-    payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
+    payment_status ENUM('pending', 'paid', 'failed', 'refund_pending') DEFAULT 'pending',
     transaction_id VARCHAR(50) NULL,
     room_id INT NOT NULL,
     check_in DATE NOT NULL,
@@ -98,7 +100,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     total_price DECIMAL(10, 2) NOT NULL,
     notes TEXT NULL,
     status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'confirmed',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE

@@ -8,7 +8,9 @@ require_once $projectRoot . '/config/lang.php';
 try {
     $stmt = $pdo->prepare("
         SELECT 
-            b.*, 
+            b.id, b.check_in, b.check_out, b.status, b.total_price, b.payment_status,
+            b.first_name, b.last_name, b.phone, b.passport_no, b.transaction_id,
+            b.user_id,
             r.number as room_number, 
             u.username,
             rt.title as room_title
@@ -25,66 +27,37 @@ try {
     echo "<div style='color:var(--danger)'>DB Error: " . $e->getMessage() . "</div>";
     exit;
 }
+?>
 
-if (empty($bookings)): ?>
-    <p style="color: var(--dry-sage); text-align: center; font-family: var(--font-mono);">No active logs found.</p>
+<div style="text-align: right; margin-bottom: 1rem;">
+    <button hx-get="/admin/forms/booking_form.php" 
+            hx-target="#booking-form-container" 
+            hx-swap="innerHTML"
+            class="btn-action btn-main" style="padding: 10px 20px;">
+        + CREATE RESERVATION
+    </button>
+</div>
+
+<div id="booking-form-container"></div>
+
+<?php if (empty($bookings)): ?>
+    <p style="color: var(--dry-sage); text-align: center; font-family: var(--font-mono);">No logs found.</p>
 <?php else: ?>
     <table class="admin-table">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Guest</th>
-                <th>Details</th>
-                <th>Room</th>
-                <th>Period</th>
+                <th>Guest Identity</th>
+                <th>Room Info</th>
+                <th>Dates</th>
                 <th>Total</th>
                 <th>Status</th>
                 <th>CMD</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="bookings-list">
             <?php foreach ($bookings as $b): ?>
-                <tr id="booking-row-<?= $b['id'] ?>">
-                    <td>#<?= $b['id'] ?></td>
-                    <td>
-                        <strong style="color:var(--gold)"><?= htmlspecialchars($b['username']) ?></strong>
-                    </td>
-                    <td>
-                        <div style="font-size:0.7rem; color:var(--dry-sage);">
-                            PH: <?= htmlspecialchars($b['phone']) ?><br>
-                            ID: <?= htmlspecialchars($b['passport_no'] ?? 'N/A') ?>
-                        </div>
-                    </td>
-                    <td>
-                        <?= htmlspecialchars($b['room_number']) ?><br>
-                        <small style="color:var(--dry-sage)"><?= htmlspecialchars($b['room_title']) ?></small>
-                    </td>
-                    <td><?= $b['check_in'] ?> <br> <?= $b['check_out'] ?></td>
-                    <td style="color:var(--light-blue)"><?= (int)$b['total_price'] ?></td>
-                    <td>
-                        <?php 
-                            $statusColor = match($b['status']) {
-                                'confirmed' => 'var(--light-blue)',
-                                'cancelled' => 'var(--danger)',
-                                default => 'var(--soft-peach)'
-                            };
-                        ?>
-                        <span style="color:<?= $statusColor ?>"><?= strtoupper($b['status']) ?></span>
-                        <?php if($b['payment_status'] == 'paid'): ?>
-                            <br><span style="font-size:0.6rem; background:var(--gold); color:black; padding:1px 3px;">PAID</span>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if ($b['status'] !== 'cancelled'): ?>
-                            <button hx-post="/api/admin/change_status.php?id=<?= $b['id'] ?>&status=cancelled"
-                                    hx-confirm="Confirm CANCELLATION of booking #<?= $b['id'] ?>?"
-                                    hx-target="#booking-row-<?= $b['id'] ?>"
-                                    class="btn-action btn-del">
-                                CANCEL
-                            </button>
-                        <?php endif; ?>
-                    </td>
-                </tr>
+                <?php include $projectRoot . '/partials/admin/booking_row.php'; ?>
             <?php endforeach; ?>
         </tbody>
     </table>

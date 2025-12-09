@@ -1,138 +1,86 @@
 <?php
+// www/api/room/book.php
 session_start();
 $projectRoot = dirname(__DIR__, 3);
 require_once $projectRoot . '/config/db.php';
 require_once $projectRoot . '/config/lang.php'; 
+require_once $projectRoot . '/includes/book_form_template.php'; // Підключаємо шаблон
 
-function renderErrorForm($ui, $roomId, $errorMsg, $data) {
-    $checkIn = htmlspecialchars($data['check_in'] ?? '');
-    $checkOut = htmlspecialchars($data['check_out'] ?? '');
-    $phone = htmlspecialchars($data['phone'] ?? '');
-    $passportNo = htmlspecialchars($data['passport'] ?? '');
-    $cardNum = htmlspecialchars($data['card_num'] ?? '');
-    $cardExp = htmlspecialchars($data['card_exp'] ?? '');
-    $cardCVC = htmlspecialchars($data['card_cvc'] ?? '');
+// === ОТРИМАННЯ ДАНИХ ===
+$roomId = $_POST['room_id'] ?? 0;
+$checkIn = $_POST['check_in'] ?? '';
+$checkOut = $_POST['check_out'] ?? '';
 
-    ?>
-    <form hx-post="/api/room/book.php" hx-swap="outerHTML" class="booking-form" id="booking-form-<?= $roomId ?>">
-        
-        <div class="booking-error-message" style="border: 2px solid var(--danger); padding: 10px; margin-bottom: 1rem; color: var(--danger); font-family: var(--font-mono); text-align: center; background: rgba(255, 68, 68, 0.1);">
-            <?= htmlspecialchars($ui['booking_failed_title'] . ': ' . $errorMsg) ?>
-        </div>
-        
-        <input type="hidden" name="room_id" value="<?= $roomId ?>">
-        
-        <div class="booking-grid">
-            <div>
-                <label class="booking-label"><?= $ui['lbl_checkin'] ?></label>
-                <input type="date" name="check_in" value="<?= $checkIn ?>" required class="booking-input">
-            </div>
-            <div>
-                <label class="booking-label"><?= $ui['lbl_checkout'] ?></label>
-                <input type="date" name="check_out" value="<?= $checkOut ?>" required class="booking-input">
-            </div>
-        </div>
-
-        <div class="booking-grid">
-            <div>
-                <label class="booking-label"><?= $ui['lbl_phone'] ?></label>
-                <input type="tel" name="phone" value="<?= $phone ?>" required class="booking-input" placeholder="+380...">
-            </div>
-            <div>
-                <label class="booking-label"><?= $ui['lbl_passport'] ?></label>
-                <input type="text" name="passport" value="<?= $passportNo ?>" required class="booking-input" placeholder="AA123456">
-            </div>
-        </div>
-
-        <div style="border: 1px solid var(--gold); padding: 10px; margin-bottom: 1rem; background: rgba(212, 175, 55, 0.05);">
-            <div style="font-family: var(--font-heading); color: var(--gold); font-size: 0.7rem; margin-bottom: 0.5rem; letter-spacing: 0.1em;">
-                <?= $ui['pay_title'] ?>
-            </div>
-            
-            <div style="margin-bottom: 0.5rem;">
-                <label class="booking-label"><?= $ui['lbl_card_num'] ?></label>
-                <input type="text" name="card_num" value="<?= $cardNum ?>" required class="booking-input" 
-                       placeholder="0000 0000 0000 0000" maxlength="19" 
-                       style="letter-spacing: 0.1em; font-family: monospace;">
-            </div>
-            
-            <div class="booking-grid" style="margin-bottom: 0;">
-                <div>
-                    <label class="booking-label"><?= $ui['lbl_card_exp'] ?></label>
-                    <input type="text" name="card_exp" value="<?= $cardExp ?>" required class="booking-input" placeholder="MM/YY" maxlength="5">
-                </div>
-                <div>
-                    <label class="booking-label"><?= $ui['lbl_card_cvc'] ?></label>
-                    <input type="password" name="card_cvc" value="<?= $cardCVC ?>" required class="booking-input" placeholder="123" maxlength="3">
-                </div>
-            </div>
-        </div>
-        
-        <div class="booking-actions">
-            <button type="submit" class="btn-confirm">
-                <?= $ui['btn_confirm'] ?>
-            </button>
-            <button type="button" 
-                    hx-get="/api/room/reset_form_button.php?id=<?= $roomId ?>" 
-                    hx-target="#booking-form-<?= $roomId ?>" 
-                    hx-swap="outerHTML"
-                    class="btn-secondary">
-                <?= $ui['btn_cancel'] ?>
-            </button>
-        </div>
-    </form>
-    <?php
-}
-
-if (!isset($_SESSION['user_id'])) {
-    renderErrorForm($ui, $roomId, $ui['err_auth'], $_POST);
-    exit;
-}
-
-$userId = $_SESSION['user_id'];
-$roomId = $_POST['room_id'];
-$checkIn = $_POST['check_in'];
-$checkOut = $_POST['check_out'];
-
+$firstName = trim($_POST['first_name'] ?? '');
+$lastName = trim($_POST['last_name'] ?? '');
 $phone = trim($_POST['phone'] ?? '');
 $passportNo = trim($_POST['passport'] ?? '');
 $notes = trim($_POST['notes'] ?? ''); 
 
+// Банківські дані
+$cardNum = str_replace(' ', '', $_POST['card_num'] ?? '');
+$cardCVC = $_POST['card_cvc'] ?? '';
+
+// === ВАЛІДАЦІЯ ===
+
+// 1. Авторизація
+if (!isset($_SESSION['user_id'])) {
+    echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => $ui['err_auth']]));
+    exit;
+}
+$userId = $_SESSION['user_id'];
+
+// 2. Дати
 if ($checkIn >= $checkOut) {
-    renderErrorForm($ui, $roomId, $ui['err_dates'], $_POST);
+    echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => $ui['err_dates']]));
     exit;
 }
 
+// 3. Імена
+if (strlen($firstName) < 2 || strlen($lastName) < 2) {
+    echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => 'Full Name is required.']));
+    exit;
+}
+
+// 4. Паспорт
 if (strlen($passportNo) < 6) {
-    renderErrorForm($ui, $roomId, 'Passport/ID number is too short.', $_POST);
+    echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => 'Valid Passport ID required.']));
     exit;
 }
 
 try {
-    $checkSql = "SELECT COUNT(*) FROM bookings WHERE room_id = ? AND status = 'confirmed' AND check_in < ? AND check_out > ?";
+    // === ПЕРЕВІРКА ДОСТУПНОСТІ ===
+    $checkSql = "SELECT COUNT(*) FROM bookings 
+                 WHERE room_id = ? 
+                 AND status IN ('confirmed', 'paid') 
+                 AND check_in < ? AND check_out > ?";
+    
     $stmt = $pdo->prepare($checkSql);
     $stmt->execute([$roomId, $checkOut, $checkIn]);
     
     if ($stmt->fetchColumn() > 0) {
-        renderErrorForm($ui, $roomId, 'Unavailable for these dates.', $_POST);
+        echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => 'Room unavailable for selected dates.']));
         exit;
     }
 
-    $roomStmt = $pdo->prepare("SELECT price FROM rooms WHERE id = ?");
-    $roomStmt->execute([$roomId]);
-    $pricePerNight = $roomStmt->fetchColumn();
+    // === РОЗРАХУНОК ЦІНИ ===
+    $stmtRoom = $pdo->prepare("SELECT price FROM rooms WHERE id = ?");
+    $stmtRoom->execute([$roomId]);
+    $pricePerNight = $stmtRoom->fetchColumn();
 
     $d1 = new DateTime($checkIn);
     $d2 = new DateTime($checkOut);
     $days = $d1->diff($d2)->days;
+    if ($days < 1) $days = 1;
     $totalPrice = $days * $pricePerNight;
 
-     $bankUrl = 'http://bank:3000/api/process-payment'; 
+    // === ОПЛАТА (GO MICROSERVICE) ===
+    $bankUrl = 'http://bank:3000/api/process-payment'; 
     $paymentData = [
-        'card_number' => str_replace(' ', '', $_POST['card_num']),
-        'amount'      => $totalPrice,
+        'card_number' => $cardNum,
+        'amount'      => (float)$totalPrice,
         'currency'    => 'CREDITS',
-        'cvv'         => $_POST['card_cvc']
+        'cvv'         => $cardCVC
     ];
 
     $ch = curl_init($bankUrl);
@@ -147,48 +95,79 @@ try {
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    
+    if ($response === false) {
+        throw new Exception("Bank connection failed: " . curl_error($ch));
+    }
     curl_close($ch);
 
     $bankResult = json_decode($response, true);
 
+    // Відмова банку
     if ($httpCode !== 200 || ($bankResult['status'] ?? '') !== 'approved') {
-        $errorMsg = $bankResult['message'] ?? 'Transaction Declined';
-        renderErrorForm($ui, $roomId, 'BANK ERROR: ' . $errorMsg, $_POST);
+        $bankMsg = $bankResult['message'] ?? 'Transaction Declined';
+        echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => 'BANK ERROR: ' . $bankMsg]));
         exit;
     }
 
     $transactionId = $bankResult['transaction_id'];
 
+    // === ЗБЕРЕЖЕННЯ В БД ===
+    $bookingStatus = 'confirmed';
     $paymentStatus = 'paid';
 
     $insert = $pdo->prepare("
-        INSERT INTO bookings (user_id, room_id, phone, check_in, check_out, total_price, notes, transaction_id, passport_no, payment_status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO bookings (
+            user_id, room_id, first_name, last_name, phone, passport_no, 
+            check_in, check_out, total_price, notes, 
+            status, payment_status, transaction_id
+        ) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
-    $insert->execute([$userId, $roomId, $phone, $checkIn, $checkOut, $totalPrice, $notes, $transactionId, $passportNo, $paymentStatus]);
+    
+    $insert->execute([
+        $userId, $roomId, $firstName, $lastName, $phone, $passportNo,
+        $checkIn, $checkOut, $totalPrice, $notes,
+        $bookingStatus, $paymentStatus, $transactionId
+    ]);
 
+    // Аудит
     require_once $projectRoot . '/includes/functions.php';
-    logAction($pdo, $userId, 'CREATE_BOOKING', "Room ID: $roomId, Total: $totalPrice");
+    logAction($pdo, $userId, 'CREATE_BOOKING', "Room: $roomId, Total: $totalPrice");
 
+    // === УСПІХ ===
     ?>
-    <div class="booking-success" style="border: 1px double var(--gold); padding: 1.5rem;">
-        <h4 style="color: var(--midnight-violet);">PAYMENT ACCEPTED</h4>
+    <div class="booking-success" style="border: 1px double var(--gold); padding: 1.5rem; animation: fadeIn 0.5s;">
+        <h4 style="color: var(--midnight-violet); font-family: var(--font-heading); margin-bottom: 1rem; letter-spacing: 0.1em;">PAYMENT ACCEPTED</h4>
+        
         <div style="text-align: left; font-family: var(--font-mono); font-size: 0.75rem; color: var(--midnight-violet); margin-top: 1rem; border-top: 1px dashed var(--midnight-violet); padding-top: 0.5rem;">
-            <div>GUEST: <?= htmlspecialchars($_SESSION['username']) ?></div>
-            <div>PASSPORT: <?= htmlspecialchars($passportNo) ?></div>
-            <div>TXN ID: <?= $transactionId ?></div>
-            <div style="margin-top: 5px; font-weight: bold;">
-                PAID: <?= $totalPrice ?> <?= $ui['currency'] ?>
+            <div style="display:flex; justify-content:space-between;">
+                <span>GUEST:</span> 
+                <strong><?= htmlspecialchars($firstName . ' ' . $lastName) ?></strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span>PASSPORT:</span> 
+                <span><?= htmlspecialchars($passportNo) ?></span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span>TXN ID:</span> 
+                <span style="font-size:0.65rem"><?= $transactionId ?></span>
+            </div>
+            
+            <div style="margin-top: 10px; font-weight: bold; border-top: 1px solid var(--midnight-violet); padding-top: 5px; display:flex; justify-content:space-between; font-size: 0.9rem;">
+                <span>TOTAL:</span>
+                <span><?= $totalPrice ?> <?= $ui['currency'] ?></span>
             </div>
         </div>
         
-        <div style="margin-top: 1rem; font-size: 0.6rem; text-transform: uppercase;">
+        <div style="margin-top: 1.5rem; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em;">
             See you on the dark side of the moon.
         </div>
     </div>
     <?php
 
 } catch (Exception $e) {
-    error_log("Booking Error: " . $e->getMessage());
-    renderErrorForm($ui, $roomId, $ui['system_failure'], $_POST);
+    error_log("Booking Critical Error: " . $e->getMessage());
+    echo renderBookingForm($ui, $roomId, array_merge($_POST, ['error_message' => $ui['system_failure']]));
 }
+?>

@@ -33,6 +33,8 @@ return [
     'lbl_notes' => "Special Requests",
     'btn_confirm' => "CONFIRM",
     'btn_cancel' => "CANCEL",
+    'lbl_firstname' => "First Name",
+    'lbl_lastname'  => "Last Name",
     'lbl_passport' => "Passport ID / ID Card",
     'lbl_card_num' => "Credit Chip Number",
     'lbl_card_exp' => "EXP",

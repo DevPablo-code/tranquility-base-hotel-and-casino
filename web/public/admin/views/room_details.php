@@ -1,6 +1,7 @@
 <?php
+// www/admin/views/room_details.php
 session_start();
-$projectRoot = dirname(__DIR__, 3);
+$projectRoot = dirname(__DIR__, 2);
 
 if (($_SESSION['role'] ?? 'guest') !== 'admin') {
     http_response_code(403);
@@ -17,6 +18,7 @@ if (!$roomId) {
 }
 
 try {
+    // 1. ОСНОВНІ ДАНІ КІМНАТИ (Без змін)
     $stmtCore = $pdo->prepare("
         SELECT 
             r.*, 
@@ -37,6 +39,7 @@ try {
         die("<div style='color:var(--danger);'>ERROR: Room #$roomId not found.</div>");
     }
 
+    // 2. ФОТОГРАФІЇ (Без змін)
     $stmtPhotos = $pdo->prepare("
         SELECT p.filename, rp.is_primary 
         FROM room_photos rp 
@@ -47,7 +50,8 @@ try {
     $stmtPhotos->execute([$roomId]);
     $photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
 
-$stmtFeatures = $pdo->prepare("
+    // 3. ФІЧІ (Без змін - числовий метод)
+    $stmtFeatures = $pdo->prepare("
         SELECT ft.name, l.code 
         FROM room_features rf 
         JOIN feature_translations ft ON rf.feature_id = ft.feature_id 
@@ -64,8 +68,13 @@ $stmtFeatures = $pdo->prepare("
         $features[$code][] = $f; 
     }
 
+    // 4. БРОНЮВАННЯ (ОНОВЛЕНО!)
+    // Додали first_name, last_name, phone, transaction_id
     $stmtBookings = $pdo->prepare("
-        SELECT b.check_in, b.check_out, b.status, u.username, b.total_price
+        SELECT 
+            b.id, b.check_in, b.check_out, b.status, b.total_price, 
+            b.first_name, b.last_name, b.phone, b.transaction_id,
+            b.user_id, u.username
         FROM bookings b
         LEFT JOIN users u ON b.user_id = u.id
         WHERE b.room_id = ? AND b.check_out >= CURDATE()
@@ -98,7 +107,7 @@ $stmtFeatures = $pdo->prepare("
 <div class="main-container" style="max-width: 1000px; margin: 0 auto; padding: 2rem;">
 
     <h1 style="color:var(--soft-peach); border-bottom: 2px solid var(--dry-sage); padding-bottom: 10px;">
-        ROOM DETAILS <span style="color:var(--gold);">#<?= $room['number'] ?></span> (ID: <?= $roomId ?>)
+        ROOM DETAILS <span style="color:var(--gold);">#<?= htmlspecialchars($room['number']) ?></span> (ID: <?= $roomId ?>)
     </h1>
     
     <a href="/admin/index.php?tab=rooms" class="btn-secondary" style="margin-bottom: 2rem; display: inline-block;">
@@ -116,24 +125,11 @@ $stmtFeatures = $pdo->prepare("
 
     <div class="detail-card">
         <h3 class="detail-heading">TRANSLATIONS</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; font-size: 0.9rem;">
-            <div>
-                <strong style="color:var(--light-blue);">[EN] Title:</strong> <?= htmlspecialchars($room['title_en']) ?><br>
-                <strong style="color:var(--light-blue);">Description:</strong>
-                <p style="margin-top: 5px; color:var(--dry-sage); font-style: italic;"><?= nl2br(htmlspecialchars($room['desc_en'])) ?></p>
-            </div>
-            <div>
-                <strong style="color:var(--gold);">[UA] Назва:</strong> <?= htmlspecialchars($room['title_ua']) ?><br>
-                <strong style="color:var(--gold);">Опис:</strong>
-                <p style="margin-top: 5px; color:var(--dry-sage); font-style: italic;"><?= nl2br(htmlspecialchars($room['desc_ua'])) ?></p>
-            </div>
         </div>
-    </div>
-
+    
     <div class="detail-card">
         <h3 class="detail-heading">FEATURES & AMENITIES</h3>
         <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.85rem;">
-            
             <?php foreach ($features as $code => $featList): ?>
                 <div style="flex-basis: 50%;">
                     <strong style="color:<?= $code=='en'?'var(--light-blue)':'var(--gold)' ?>; border-bottom: 1px dotted <?= $code=='en'?'var(--light-blue)':'var(--gold)' ?>;">
@@ -148,25 +144,10 @@ $stmtFeatures = $pdo->prepare("
             <?php endforeach; ?>
         </div>
     </div>
-    
+
     <div class="detail-card">
         <h3 class="detail-heading">PHOTO GALLERY (CDN)</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem;">
-            <?php foreach ($photos as $photo): ?>
-                <div style="position: relative;">
-                    <img src="http://localhost:4000/images/<?= htmlspecialchars($photo['filename']) ?>" 
-                         class="photo-thumb <?= $photo['is_primary'] ? 'is-primary' : '' ?>" 
-                         alt="Room Photo">
-                    <?php if($photo['is_primary']): ?>
-                        <span style="position: absolute; top: 0; right: 0; background: var(--gold); color: black; padding: 2px 4px; font-size: 0.6rem; font-weight: bold;">MAIN</span>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-            <?php if (empty($photos)): ?>
-                <p style="color:var(--danger);">No images linked in DB.</p>
-            <?php endif; ?>
         </div>
-    </div>
 
     <div class="detail-card">
         <h3 class="detail-heading">ACTIVE/FUTURE BOOKINGS</h3>
@@ -176,21 +157,40 @@ $stmtFeatures = $pdo->prepare("
             <table class="admin-table" style="width: 100%; font-size: 0.8rem;">
                 <thead>
                     <tr>
-                        <th>Guest</th>
-                        <th>Check-in</th>
-                        <th>Check-out</th>
+                        <th>Guest Info</th>
+                        <th>Dates</th>
                         <th>Status</th>
-                        <th>Total Price</th>
+                        <th>Total</th>
+                        <th>Trans. ID</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($bookings as $b): ?>
                         <tr style="color:<?= $b['status']=='confirmed'?'var(--soft-peach)':'var(--dry-sage)' ?>;">
-                            <td><?= htmlspecialchars($b['username'] ?? 'SYSTEM') ?></td>
-                            <td><?= $b['check_in'] ?></td>
-                            <td><?= $b['check_out'] ?></td>
+                            <td>
+                                <strong style="color:var(--gold); font-size: 0.9rem;">
+                                    <?= htmlspecialchars($b['first_name'] . ' ' . $b['last_name']) ?>
+                                </strong>
+                                <br>
+                                <span style="font-size:0.7rem;"><?= htmlspecialchars($b['phone']) ?></span>
+                                <br>
+                                <small style="color:var(--dry-sage);">Account: <?= htmlspecialchars($b['username'] ?? 'N/A') ?></small>
+                            </td>
+                            
+                            <td>
+                                <div style="display:flex; flex-direction:column;">
+                                    <span>IN: <?= $b['check_in'] ?></span>
+                                    <span>OUT: <?= $b['check_out'] ?></span>
+                                </div>
+                            </td>
+                            
                             <td><?= strtoupper($b['status']) ?></td>
-                            <td style="color:var(--gold);"><?= $b['total_price'] ?> CR</td>
+                            
+                            <td style="color:var(--gold); font-weight:bold;"><?= $b['total_price'] ?> CR</td>
+                            
+                            <td style="font-family: monospace; font-size: 0.7rem; color: var(--dry-sage);">
+                                <?= htmlspecialchars($b['transaction_id'] ?? 'N/A') ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
